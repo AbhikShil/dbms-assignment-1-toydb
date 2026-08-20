@@ -10,10 +10,32 @@
 #define SLOT_COUNT_OFFSET 2
 #define checkerr(err) {if (err < 0) {PF_PrintError(); exit(EXIT_FAILURE);}}
 
-int  getLen(int slot, byte *pageBuf);
-int  getNumSlots(byte *pageBuf);
-void setNumSlots(byte *pageBuf, int nslots);
-int  getNthSlotOffset(int slot, char* pageBuf);
+int  getLen(int slot, byte *pageBuf){
+    int nslots = getNumSlots(pageBuf);
+    int offset = getNthSlotOffset(slot, pageBuf);
+    
+    int NextOffset;
+    if(slot == nslots-1){
+        NextOffset = DecodeShort(pageBuf);
+    }else{
+        NextOffset = getNthSlotOffset(slot+1, pageBuf);
+    }
+
+    return offset - NextOffset;
+
+}
+
+int  getNumSlots(byte *pageBuf){
+    return DecodeShort(pageBuf + SLOT_COUNT_OFFSET);
+
+}
+void setNumSlots(byte *pageBuf, int nslots){
+    EncodeShort((short)nslots, pageBuf+SLOT_COUNT_OFFSET);
+}
+int  getNthSlotOffset(int slot, char* pageBuf){
+    return DecodeShort(pageBuf+4+slot*2);
+}
+
 
 
 /**
@@ -25,7 +47,9 @@ int  getNthSlotOffset(int slot, char* pageBuf);
 int
 Table_Open(char *dbname, Schema *schema, bool overwrite, Table **ptable)
 {
-    UNIMPLEMENTED;
+    //UNIMPLEMENTED;
+    PF_Init();
+    
     // Initialize PF, create PF file,
     // allocate Table structure  and initialize and return via ptable
     // The Table structure only stores the schema. The current functionality
