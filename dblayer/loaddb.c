@@ -25,13 +25,28 @@ in codec.c to convert strings into compact binary representations
  */
 int
 encode(Schema *sch, char **fields, byte *record, int spaceLeft) {
-    UNIMPLEMENTED;
     // for each field
     //    switch corresponding schema type is
     //        VARCHAR : EncodeCString
     //        INT : EncodeInt
     //        LONG: EncodeLong
     // return the total number of bytes encoded into record
+    int type;
+    int offset=0;
+    for(int i=0; i<sch->numColumns; i++){
+        type = sch->columns[i]->type;
+        switch(type){
+            case INT: offset+= EncodeInt(atoi(fields[i]), record+offset);
+                      break;
+
+            case VARCHAR: offset+= EncodeCString(fields[i], record+offset, spaceLeft-offset);
+                          break;
+
+            case LONG: offset+= EncodeLong(atoll(fields[i]), record+offset);
+                       break;
+        }
+    }
+    return offset;
 }
 
 Schema *
@@ -54,28 +69,36 @@ loadCSV() {
     Schema *sch = parseSchema(line);
     Table *tbl;
 
-    UNIMPLEMENTED;
+    //Abhik Implementing Open Table
+    Table_Open(DB_NAME, sch, true, &tbl);
+    int err = AM_CreateIndex(DB_NAME, 0, 'i', 4);
+    checkerr(err);
+    int indexFD = PF_OpenFile(INDEX_NAME);
+    checkerr(indexFD);
 
     char *tokens[MAX_TOKENS];
     char record[MAX_PAGE_SIZE];
 
     while ((line = fgets(buf, MAX_LINE_LEN, fp)) != NULL) {
-	int n = split(line, ",", tokens);
-	assert (n == sch->numColumns);
-	int len = encode(sch, tokens, record, sizeof(record));
-	RecId rid;
+        int n = split(line, ",", tokens);
+        assert (n == sch->numColumns);
+        int len = encode(sch, tokens, record, sizeof(record));
+        RecId rid;
 
-	UNIMPLEMENTED;
+        //Abhik implemented Record insert
+        err = Table_Insert(tbl, record, len, &rid);
+        checkerr(err);
 
-	printf("%d %s\n", rid, tokens[0]);
 
-	// Indexing on the population column 
-	int population = atoi(tokens[2]);
+        printf("%d %s\n", rid, tokens[0]);
 
-	UNIMPLEMENTED;
-	// Use the population field as the field to index on
-	    
-	checkerr(err);
+        // Indexing on the population column 
+        int population = atoi(tokens[2]);
+
+        //Abhik Inserted Index Entry
+        // Use the population field as the field to index on
+        err = AM_InsertEntry(indexFD, 'i', 4, (char *)&population, rid);
+        checkerr(err);
     }
     fclose(fp);
     Table_Close(tbl);
