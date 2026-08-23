@@ -21,8 +21,10 @@ typedef struct {
 typedef struct {
     Schema *schema;
     int fd; 
+
+    int currpage;
     
-} Table ;
+} Table;
 
 typedef int RecId;
 
