@@ -25,7 +25,37 @@ in codec.c to convert strings into compact binary representations
  */
 int
 encode(Schema *sch, char **fields, byte *record, int spaceLeft) {
-    UNIMPLEMENTED;
+    int total = 0;
+
+    for(int i=0 ; i<sch->numColumns ; i++){
+        int bytes_encoded = 0;
+
+        switch(sch->columns[i]->type){
+
+            case VARCHAR:
+                bytes_encoded = EncodeCString();
+
+            case INT:
+                bytes_encoded = EncodeInt();
+
+            case LONG:
+                bytes_encoded = EncodeLong();
+
+            default:
+                fprintf(stderr, "Unknown column type\n");
+                exit(EXIT_FAILURE);
+        }
+
+        total += bytes_encoded;
+
+        if(total > spaceLeft){
+            fprintf(stderr, "Record too large\n");
+            exit(EXIT_FAILURE);
+        }
+
+    }
+
+    return total;
     // for each field
     //    switch corresponding schema type is
     //        VARCHAR : EncodeCString
