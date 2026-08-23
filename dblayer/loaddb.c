@@ -33,13 +33,13 @@ encode(Schema *sch, char **fields, byte *record, int spaceLeft) {
         switch(sch->columns[i]->type){
 
             case VARCHAR:
-                bytes_encoded = EncodeCString();
+                bytes_encoded = EncodeCString(fields[i], record+total, spaceLeft-total);
 
             case INT:
-                bytes_encoded = EncodeInt();
+                bytes_encoded = EncodeInt(atoi(fields[i]), record+total);
 
             case LONG:
-                bytes_encoded = EncodeLong();
+                bytes_encoded = EncodeLong(atoi(fields[i]), record+total);
 
             default:
                 fprintf(stderr, "Unknown column type\n");
