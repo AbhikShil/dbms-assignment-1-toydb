@@ -34,12 +34,15 @@ encode(Schema *sch, char **fields, byte *record, int spaceLeft) {
 
             case VARCHAR:
                 bytes_encoded = EncodeCString(fields[i], record+total, spaceLeft-total);
+                break;
 
             case INT:
                 bytes_encoded = EncodeInt(atoi(fields[i]), record+total);
+                break;
 
             case LONG:
-                bytes_encoded = EncodeLong(atoi(fields[i]), record+total);
+                bytes_encoded = EncodeLong(atoll(fields[i]), record+total);
+                break;
 
             default:
                 fprintf(stderr, "Unknown column type\n");
