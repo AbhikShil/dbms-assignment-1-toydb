@@ -1,0 +1,9 @@
+.DS_Store
+*.o
+*.db
+*.db.0
+*.exe
+*.a
+*.out
+dumpdb
+loaddb
