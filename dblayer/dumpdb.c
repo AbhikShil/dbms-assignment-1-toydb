@@ -7,13 +7,54 @@
 #include "../amlayer/am.h"
 #define checkerr(err) {if (err < 0) {PF_PrintError(); exit(1);}}
 
+#define MAX_PAGE_SIZE 4000
 
 void
 printRow(void *callbackObj, RecId rid, byte *row, int len) {
     Schema *schema = (Schema *) callbackObj;
     byte *cursor = row;
 
-    UNIMPLEMENTED;
+    for(int i=0 ; i<schema->numColumns ; i++){
+        if(i > 0){
+            printf(", ");
+        }
+
+        switch(schema->columns[i]->type){
+
+            case VARCHAR:{
+                char str[MAX_PAGE_SIZE];
+                
+                int n = DecodeCString(cursor, str, sizeof(str));
+
+                printf("%s", str);
+                cursor += n+2;
+                break;
+            }
+
+            case INT:{
+                int value = DecodeInt(cursor);
+
+                printf("%d", value);
+
+                cursor += 4;
+                break;
+            }
+
+            case LONG:{
+                long long value = DecodeLong(cursor);
+                printf("%lld", value);
+                cursor += 8;
+                break;
+            }
+
+            default:
+                fprintf(2, "Unknown column type!");
+                exit(EXIT_FAILURE);
+        }
+    }
+
+    printf('\n');
+
 }
 
 #define DB_NAME "data.db"
