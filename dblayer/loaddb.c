@@ -110,31 +110,31 @@ loadCSV() {
     char record[MAX_PAGE_SIZE];
 
     while ((line = fgets(buf, MAX_LINE_LEN, fp)) != NULL) {
-	int n = split(line, ",", tokens);
-	assert (n == sch->numColumns);
-	int len = encode(sch, tokens, record, sizeof(record));
-	RecId rid;
+        int n = split(line, ",", tokens);
+        assert (n == sch->numColumns);
+        int len = encode(sch, tokens, record, sizeof(record));
+        RecId rid;
 
-	err = Table_Insert(tbl, record, len, &rid);
+        err = Table_Insert(tbl, record, len, &rid);
 
-    checkerr(err);
+        checkerr(err);
 
-	printf("%d %s\n", rid, tokens[0]);
+        printf("%d %s\n", rid, tokens[0]);
 
-	// Indexing on the population column 
-	int population = atoi(tokens[2]);
+        // Indexing on the population column 
+        int population = atoi(tokens[2]);
 
-    
-	// Use the population field as the field to index on
-    err = AM_InsertEntry(
-            indexFD,
-            'i',
-            sizeof(int),
-            (char *)&population,
-            rid
-        );
-	    
-	checkerr(err);
+        
+        // Use the population field as the field to index on
+        err = AM_InsertEntry(
+                indexFD,
+                'i',
+                sizeof(int),
+                (char *)&population,
+                rid
+            );
+            
+        checkerr(err);
     }
     fclose(fp);
     Table_Close(tbl);
