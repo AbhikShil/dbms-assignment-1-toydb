@@ -10,6 +10,9 @@
 #define SLOT_COUNT_OFFSET 2
 #define checkerr(err) {if (err < 0) {PF_PrintError(); exit(EXIT_FAILURE);}}
 
+int getNumSlots(byte *pageBuf);
+int  getNthSlotOffset(int slot, char* pageBuf);
+
 int  getLen(int slot, byte *pageBuf){
     int nslots = getNumSlots(pageBuf);
     int offset = getNthSlotOffset(slot, pageBuf);
@@ -105,7 +108,7 @@ Table_Insert(Table *tbl, byte *record, int len, RecId *rid) {
         }
     }else{
         // Get the page we are currently inserting in
-        err = PF_GetThisPage(tbl->fd, &tbl->currpage, &pageBuf);
+        err = PF_GetThisPage(tbl->fd, tbl->currpage, &pageBuf);
 
         checkerr(err);
     }

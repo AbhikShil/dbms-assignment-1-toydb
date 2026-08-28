@@ -48,12 +48,12 @@ printRow(void *callbackObj, RecId rid, byte *row, int len) {
             }
 
             default:
-                fprintf(2, "Unknown column type!");
+                fprintf(stderr, "Unknown column type!");
                 exit(EXIT_FAILURE);
         }
     }
 
-    printf('\n');
+    printf("\n");
 
 }
 
@@ -83,7 +83,7 @@ index_scan(Table *tbl, Schema *schema, int indexFD, int op, int value) {
         int len = Table_Get(tbl, rid, record, sizeof(record));
 
         if(len < 0){
-            fprintf(2, "Get table failed");
+            fprintf(stderr, "Get table failed");
             exit(EXIT_FAILURE);
         }
 
