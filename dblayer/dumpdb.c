@@ -64,7 +64,7 @@ void
 index_scan(Table *tbl, Schema *schema, int indexFD, int op, int value) {
     int scanDesc;
 
-    scanDesc = AM_OpenIndexScan(indexFD, 'i', sizeof(int), op, (char *)value);
+    scanDesc = AM_OpenIndexScan(indexFD, 'i', sizeof(int), op, (char *)&value);
 
     if(scanDesc < 0){
         AM_PrintError("AM_openIndexScan");
@@ -74,8 +74,12 @@ index_scan(Table *tbl, Schema *schema, int indexFD, int op, int value) {
     while(1){
         int rid = AM_FindNextEntry(scanDesc);
 
-        if(rid == AM_NOT_FOUND){
+        if(rid == AME_EOF){
             break;
+        }
+        if (rid < 0) {
+            AM_PrintError("AM_FindNextEntry");
+            exit(EXIT_FAILURE);
         }
 
         byte record[PF_PAGE_SIZE];

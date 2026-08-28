@@ -199,7 +199,7 @@ Table_Get(Table *tbl, RecId rid, byte *record, int maxlen) {
         copylen = maxlen;
     }
 
-    memcpy(record, pageBuf+offset, len);
+    memcpy(record, pageBuf+offset, copylen);
 
     err = PF_UnfixPage(tbl->fd, pageNum, false);
     checkerr(err);
@@ -230,7 +230,7 @@ Table_Scan(Table *tbl, void *callbackObj, ReadFunc callbackfn) {
     }
 
 
-    if(err != PFE_OK){
+    if(err != PFE_EOF){
         checkerr(err);
     }
     // For each page obtained using PF_GetFirstPage and PF_GetNextPage
