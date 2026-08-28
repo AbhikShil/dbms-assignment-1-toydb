@@ -62,16 +62,40 @@ printRow(void *callbackObj, RecId rid, byte *row, int len) {
 	 
 void
 index_scan(Table *tbl, Schema *schema, int indexFD, int op, int value) {
-    UNIMPLEMENTED;
-    /*
-    Open index ...
-    while (true) {
-	find next entry in index
-	fetch rid from table
-        printRow(...)
+    int scanDesc;
+
+    scanDesc = AM_OpenIndexScan(indexFD, 'i', sizeof(int), op, (char *)value);
+
+    if(scanDesc < 0){
+        AM_PrintError("AM_openIndexScan");
+        exit(EXIT_FAILURE);
     }
-    close index ...
-    */
+
+    while(1){
+        int rid = AM_FindNextEntry(scanDesc);
+
+        if(rid == AM_NOT_FOUND){
+            break;
+        }
+
+        byte record[PF_PAGE_SIZE];
+
+        int len = Table_Get(tbl, rid, record, sizeof(record));
+
+        if(len < 0){
+            fprintf(2, "Get table failed");
+            exit(EXIT_FAILURE);
+        }
+
+        printRow(schema, rid, record, len);
+
+    }
+    int err = AM_CloseIndexScan(scanDesc);
+
+    if(err < 0){
+        AM_PrintError("AM_CloseIndexScan");
+        exit(EXIT_FAILURE);
+    }
 }
 
 int
