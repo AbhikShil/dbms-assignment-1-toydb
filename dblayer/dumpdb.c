@@ -98,25 +98,35 @@ index_scan(Table *tbl, Schema *schema, int indexFD, int op, int value) {
     }
 }
 
+
+
 int
 main(int argc, char **argv) {
     char *schemaTxt = "Country:varchar,Capital:varchar,Population:int";
     Schema *schema = parseSchema(schemaTxt);
     Table *tbl;
 
-    UNIMPLEMENTED;
-    if (argc == 2 && *(argv[1]) == 's') {
-	UNIMPLEMENTED;
-	// invoke Table_Scan with printRow, which will be invoked for each row in the table.
-    } else {
-	// index scan by default
-	int indexFD = PF_OpenFile(INDEX_NAME);
-	checkerr(indexFD);
+    int err = Table_Open(DB_NAME, schema, false, &tbl);
 
-	// Ask for populations less than 100000, then more than 100000. Together they should
-	// yield the complete database.
-	index_scan(tbl, schema, indexFD, LESS_THAN_EQUAL, 100000);
-	index_scan(tbl, schema, indexFD, GREATER_THAN, 100000);
+    checkerr(err);
+
+    if (argc == 2 && *(argv[1]) == 's') {
+	    Table_Scan(tbl, schema, printRow);
+	
+        // invoke Table_Scan with printRow, which will be invoked for each row in the table.
+    } else {
+        // index scan by default
+        int indexFD = PF_OpenFile(INDEX_NAME);
+        checkerr(indexFD);
+
+        // Ask for populations less than 100000, then more than 100000. Together they should
+        // yield the complete database.
+        index_scan(tbl, schema, indexFD, LESS_THAN_EQUAL, 100000);
+        index_scan(tbl, schema, indexFD, GREATER_THAN, 100000);
+
+        checkerr(PF_CloseFile(indexFD));
     }
     Table_Close(tbl);
+
+    return 0;
 }
