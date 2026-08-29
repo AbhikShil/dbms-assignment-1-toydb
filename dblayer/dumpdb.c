@@ -6,7 +6,7 @@
 #include "../pflayer/pf.h"
 #include "../amlayer/am.h"
 #define checkerr(err) {if (err < 0) {PF_PrintError(); exit(1);}}
-
+#define MAX_PAGE_SIZE 4000
 
 void
 printRow(void *callbackObj, RecId rid, byte *row, int len) {
@@ -20,7 +20,7 @@ printRow(void *callbackObj, RecId rid, byte *row, int len) {
             case VARCHAR: 
                 int offset = DecodeCString(cursor, strBuf, sizeof(strBuf));
                 printf("%s",strBuf);
-                cursor += offset;
+                cursor += offset+2;
                 break;
             
             case INT:

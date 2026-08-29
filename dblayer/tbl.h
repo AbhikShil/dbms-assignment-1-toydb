@@ -22,7 +22,7 @@ typedef struct {
     Schema *schema;
 
     int fd;
-    int currPage;
+    int currentPage;
     
 } Table ;
 
