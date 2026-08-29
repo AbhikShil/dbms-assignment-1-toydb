@@ -1,6 +1,6 @@
 
 CC=cc
-CFLAGS = -g
+CFLAGS = -g -std=gnu89
 
 OBJS=am.o amfns.o amsearch.o aminsert.o amstack.o amglobals.o amscan.o amprint.o misc.o
 

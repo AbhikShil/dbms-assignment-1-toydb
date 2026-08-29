@@ -2,7 +2,7 @@
 #CC=afl-clang
 
 CC=cc
-CFLAGS = -g
+CFLAGS = -g -std=gnu89
 #PUBLICDIR= /usr0/cs564/public/project
 SRC= buf.c hash.c pf.c
 OBJ= buf.o hash.o pf.o
